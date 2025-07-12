@@ -60,6 +60,33 @@
             font-size: 1.1rem;
         }
         
+	.current-day-button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0 auto 15px auto;
+            display: block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .current-day-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .current-day-button:disabled {
+            background: #ccc;
+            color: #666;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
         .slider-container {
             position: relative;
             margin: 20px 0;
@@ -241,6 +268,9 @@
 <div class="controls">
 <div class="date-control">
 <label for="dateSlider">Turniertag auswählen:</label>
+<button class="current-day-button" id="currentDayButton">
+    📅 Heute (WM läuft nicht)
+</button>
 <div class="slider-container">
 <input class="date-slider" id="dateSlider" max="38" min="0" type="range" value="0"/>
 <div class="date-info">
@@ -580,6 +610,11 @@
             } else {
                 matchInfo.classList.remove('show');
             }
+	    // Match-Info Überschrift mit Datum aktualisieren
+    	    const matchInfoHeader = document.querySelector('#matchInfo h4');
+    	    if (matchInfoHeader) {
+        	matchInfoHeader.textContent = `🏟️ Matches des Tages - ${currentDate}`;
+    	    }
         }
 
         dateSlider.addEventListener('input', (e) => {
