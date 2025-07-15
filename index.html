@@ -1,11 +1,12 @@
 <!DOCTYPE html>
+
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FIFA WM 2026 - Stadion-Karte</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FIFA WM 2026 - Stadion-Karte</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" rel="stylesheet"/>
+<style>
         body {
             margin: 0;
             padding: 0;
@@ -59,6 +60,33 @@
             font-size: 1.1rem;
         }
         
+	.current-day-button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0 auto 15px auto;
+            display: block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .current-day-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .current-day-button:disabled {
+            background: #ccc;
+            color: #666;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
         .slider-container {
             position: relative;
             margin: 20px 0;
@@ -161,11 +189,12 @@
         
         .match-info {
             display: none;
-            margin-top: 15px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
         }
         
         .match-info.show {
@@ -232,71 +261,68 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🏆 FIFA WM 2026 Stadion-Karte</h1>
-            <p>Interaktive Karte aller Spielstätten in Kanada, Mexiko und den USA</p>
-        </div>
-        
-        <div class="controls">
-            <div class="date-control">
-                <label for="dateSlider">Turniertag auswählen:</label>
-                <div class="slider-container">
-                    <input type="range" id="dateSlider" class="date-slider" min="0" max="38" value="0">
-                    <div class="date-info">
-                        <span>11. Juni 2026</span>
-                        <span>19. Juli 2026</span>
-                    </div>
-                </div>
-                <div class="current-date" id="currentDate">
+<div class="container">
+<div class="header">
+<h1>🏆 FIFA WM 2026 Stadion-Karte</h1>
+<p>Interaktive Karte aller Spielstätten in Kanada, Mexiko und den USA</p>
+</div>
+<div class="controls">
+<div class="date-control">
+<label for="dateSlider">Turniertag auswählen:</label>
+<button class="current-day-button" id="currentDayButton">
+    📅 Heute (WM läuft nicht)
+</button>
+<div class="slider-container">
+<input class="date-slider" id="dateSlider" max="38" min="0" type="range" value="0"/>
+<div class="date-info">
+<span>11. Juni 2026</span>
+<span>19. Juli 2026</span>
+</div>
+</div>
+<div class="current-date" id="currentDate">
                     📅 Donnerstag, 11. Juni 2026 - Turniertag 1
                 </div>
-            </div>
-            
-            <div class="legend">
-                <div class="legend-item">
-                    <div class="legend-icon active-venue"></div>
-                    <span>Spielstätten mit Matches heute</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-icon inactive-venue"></div>
-                    <span>Spielstätten ohne Matches heute</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="map-container" id="map"></div>
-
-	<div class="match-info" id="matchInfo">
-                <h4>🏟️ Matches des Tages</h4>
-                <ul class="match-list" id="matchList"></ul>
-            </div>
-        
-        <div class="info-panel">
-            <h3>📊 Turnierstatistiken</h3>
-            <div class="stats">
-                <div class="stat-item">
-                    <span class="stat-number">16</span>
-                    <span class="stat-label">Spielstätten</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">104</span>
-                    <span class="stat-label">Matches</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">39</span>
-                    <span class="stat-label">Turniertage</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">48</span>
-                    <span class="stat-label">Teams</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
-    <script>
+</div>
+<div class="legend">
+<div class="legend-item">
+<div class="legend-icon active-venue"></div>
+<span>Spielstätten mit Matches heute</span>
+</div>
+<div class="legend-item">
+<div class="legend-icon inactive-venue"></div>
+<span>Spielstätten ohne Matches heute</span>
+</div>
+</div>
+</div>
+<div class="map-container" id="map"></div>
+<div class="match-info" id="matchInfo">
+<h4>🏟️ Matches des Tages</h4>
+<ul class="match-list" id="matchList"></ul>
+</div>
+<div class="info-panel">
+<h3>📊 Turnierstatistiken</h3>
+<div class="stats">
+<div class="stat-item">
+<span class="stat-number">16</span>
+<span class="stat-label">Spielstätten</span>
+</div>
+<div class="stat-item">
+<span class="stat-number">104</span>
+<span class="stat-label">Matches</span>
+</div>
+<div class="stat-item">
+<span class="stat-number">39</span>
+<span class="stat-label">Turniertage</span>
+</div>
+<div class="stat-item">
+<span class="stat-number">48</span>
+<span class="stat-label">Teams</span>
+</div>
+</div>
+</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
         // Spielstätten mit Koordinaten
         const venues = [
             // USA
@@ -575,16 +601,23 @@
                 
                 // Match-Liste anzeigen
                 matchList.innerHTML = '';
-                dayMatches.forEach(match => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<strong>${match.venue}</strong><br>${match.match} - ${match.time} Uhr`;
-                    matchList.appendChild(li);
+		dayMatches.forEach(match => {
+		    const venue = venues.find(v => v.name === match.venue);
+		    const cityName = venue ? venue.city : '';
+		    const li = document.createElement('li');
+		    li.innerHTML = `<strong>${match.venue} (${cityName})</strong><br>${match.match} - ${match.time} Uhr`;
+		    matchList.appendChild(li);
                 });
                 
                 matchInfo.classList.add('show');
             } else {
                 matchInfo.classList.remove('show');
             }
+	    // Match-Info Überschrift mit Datum aktualisieren
+    	    const matchInfoHeader = document.querySelector('#matchInfo h4');
+    	    if (matchInfoHeader) {
+        	matchInfoHeader.textContent = `🏟️ Matches des Tages - ${currentDate}`;
+    	    }
         }
 
         dateSlider.addEventListener('input', (e) => {
@@ -594,5 +627,22 @@
         // Initialisierung
         updateMapForDay(0);
     </script>
+
+<script>
+  // Transit tile layer (example using a transport tile provider)
+  var transitLayer = L.tileLayer('https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=db7fa04fb97841db9c0858995a30cbb6', {
+    attribution: '&copy; <a href="https://www.thunderforest.com/">Thunderforest</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 22
+  });
+
+  // Add layer control if map is defined
+  if (typeof map !== 'undefined') {
+    var baseMaps = {};
+    var overlayMaps = {
+      "ÖPNV Layer": transitLayer
+    };
+    L.control.layers(baseMaps, overlayMaps).addTo(map);
+  }
+</script>
 </body>
 </html>
