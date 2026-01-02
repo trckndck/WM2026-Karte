@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="de">
 <head>
 <meta charset="utf-8"/>
@@ -7,258 +6,272 @@
 <title>FIFA WM 2026 - Stadion-Karte</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" rel="stylesheet"/>
 <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-        
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Arial', sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 30px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    .header p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+
+    .controls {
+        background: rgba(255,255,255,0.95);
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        backdrop-filter: blur(10px);
+    }
+
+    .date-control {
+        margin-bottom: 20px;
+    }
+
+    .date-control label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #333;
+        font-size: 1.1rem;
+    }
+
+    .current-day-button {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        margin: 0 auto 15px auto;
+        display: block;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .current-day-button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .current-day-button:disabled {
+        background: #ccc;
+        color: #666;
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+
+    .slider-container {
+        position: relative;
+        margin: 20px 0;
+    }
+
+    .date-slider {
+        width: 100%;
+        height: 8px;
+        border-radius: 5px;
+        background: linear-gradient(to right, #667eea, #764ba2);
+        outline: none;
+        -webkit-appearance: none;
+        appearance: none;
+        cursor: pointer;
+    }
+
+    .date-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #fff;
+        border: 3px solid #667eea;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .date-slider::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #fff;
+        border: 3px solid #667eea;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .date-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .current-date {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #333;
+        text-align: center;
+        margin: 15px 0;
+        padding: 10px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 8px;
+    }
+
+    .legend {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-bottom: 20px;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        color: #555;
+    }
+
+    .legend-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid #333;
+    }
+
+    .active-venue { background: #ff4444; }
+    .inactive-venue { background: #ccc; }
+
+    .map-container {
+        height: 600px;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+
+    .info-panel {
+        background: rgba(255,255,255,0.95);
+        padding: 20px;
+        border-radius: 15px;
+        margin-top: 20px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        backdrop-filter: blur(10px);
+    }
+
+    .match-info {
+        display: none;
+        margin-top: 20px;
+        padding: 20px;
+        background: rgba(255,255,255,0.95);
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        backdrop-filter: blur(10px);
+    }
+
+    .match-info.show {
+        display: block;
+    }
+
+    .match-list {
+        list-style: none;
+        padding: 0;
+        margin: 10px 0;
+    }
+
+    .match-list li {
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+        font-size: 0.9rem;
+    }
+
+    .match-list li:last-child {
+        border-bottom: none;
+    }
+
+    .stats {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .stat-item {
+        padding: 15px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 8px;
+        min-width: 100px;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        display: block;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+        .time-mesz {
+        font-weight: 700;
+        color: #667eea;
+        background: #e8eaf6;
+        padding: 3px 8px;
+        border-radius: 4px;
+    }
+
+    .time-local {
+        background: #f1f3f4;
+        padding: 3px 8px;
+        border-radius: 4px;
+    }
+
+    @media (max-width: 768px) {
         .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-        
-        .header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-        
-        .controls {
-            background: rgba(255,255,255,0.95);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px);
-        }
-        
-        .date-control {
-            margin-bottom: 20px;
-        }
-        
-        .date-control label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #333;
-            font-size: 1.1rem;
-        }
-        
-	.current-day-button {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin: 0 auto 15px auto;
-            display: block;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-        
-        .current-day-button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-        
-        .current-day-button:disabled {
-            background: #ccc;
-            color: #666;
-            cursor: not-allowed;
-            box-shadow: none;
+            font-size: 2rem;
         }
 
-        .slider-container {
-            position: relative;
-            margin: 20px 0;
-        }
-        
-        .date-slider {
-            width: 100%;
-            height: 8px;
-            border-radius: 5px;
-            background: linear-gradient(to right, #667eea, #764ba2);
-            outline: none;
-            -webkit-appearance: none;
-            appearance: none;
-            cursor: pointer;
-        }
-        
-        .date-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #fff;
-            border: 3px solid #667eea;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        }
-        
-        .date-slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #fff;
-            border: 3px solid #667eea;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        }
-        
-        .date-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-            font-size: 0.9rem;
-            color: #666;
-        }
-        
-        .current-date {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #333;
-            text-align: center;
-            margin: 15px 0;
-            padding: 10px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            border-radius: 8px;
-        }
-        
         .legend {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 20px;
+            flex-direction: column;
+            gap: 15px;
         }
-        
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
-            color: #555;
-        }
-        
-        .legend-icon {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            border: 2px solid #333;
-        }
-        
-        .active-venue { background: #ff4444; }
-        .inactive-venue { background: #ccc; }
-        
-        .map-container {
-            height: 600px;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-        }
-        
-        .info-panel {
-            background: rgba(255,255,255,0.95);
-            padding: 20px;
-            border-radius: 15px;
-            margin-top: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px);
-        }
-        
-        .match-info {
-            display: none;
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(255,255,255,0.95);
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px);
-        }
-        
-        .match-info.show {
-            display: block;
-        }
-        
-        .match-list {
-            list-style: none;
-            padding: 0;
-            margin: 10px 0;
-        }
-        
-        .match-list li {
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-            font-size: 0.9rem;
-        }
-        
-        .match-list li:last-child {
-            border-bottom: none;
-        }
-        
+
         .stats {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 20px;
-            text-align: center;
+            flex-direction: column;
+            gap: 10px;
         }
-        
-        .stat-item {
-            padding: 15px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            border-radius: 8px;
-            min-width: 100px;
-        }
-        
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            display: block;
-        }
-        
-        .stat-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-        
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .legend {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .stats {
-                flex-direction: column;
-                gap: 10px;
-            }
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
 <div class="container">
@@ -280,8 +293,8 @@
 </div>
 </div>
 <div class="current-date" id="currentDate">
-                    📅 Donnerstag, 11. Juni 2026 - Turniertag 1
-                </div>
+    📅 Donnerstag, 11. Juni 2026 - Turniertag 1
+</div>
 </div>
 <div class="legend">
 <div class="legend-item">
@@ -321,321 +334,1509 @@
 </div>
 </div>
 </div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
-        // Spielstätten mit Koordinaten
-        const venues = [
-            // USA
-            { name: "MetLife Stadium", city: "New York/New Jersey", country: "USA", lat: 40.8128, lng: -74.0742, capacity: 82500 },
-            { name: "Mercedes-Benz Stadium", city: "Atlanta", country: "USA", lat: 33.7553, lng: -84.4006, capacity: 75000 },
-            { name: "AT&T Stadium", city: "Dallas", country: "USA", lat: 32.7477, lng: -97.0933, capacity: 80000 },
-            { name: "Arrowhead Stadium", city: "Kansas City", country: "USA", lat: 39.0489, lng: -94.4839, capacity: 76416 },
-            { name: "SoFi Stadium", city: "Los Angeles", country: "USA", lat: 33.9535, lng: -118.3392, capacity: 70000 },
-            { name: "Lumen Field", city: "Seattle", country: "USA", lat: 47.5952, lng: -122.3316, capacity: 69000 },
-            { name: "Levi's Stadium", city: "San Francisco Bay Area", country: "USA", lat: 37.4032, lng: -121.9698, capacity: 68500 },
-            { name: "Lincoln Financial Field", city: "Philadelphia", country: "USA", lat: 39.9008, lng: -75.1675, capacity: 69596 },
-            { name: "Hard Rock Stadium", city: "Miami", country: "USA", lat: 25.9581, lng: -80.2389, capacity: 65000 },
-            { name: "Gillette Stadium", city: "Boston", country: "USA", lat: 42.0909, lng: -71.2643, capacity: 70000 },
-            { name: "NRG Stadium", city: "Houston", country: "USA", lat: 29.6847, lng: -95.4107, capacity: 72220 },
-            
-            // Kanada
-            { name: "BC Place", city: "Vancouver", country: "Kanada", lat: 49.2767, lng: -123.1119, capacity: 54500 },
-            { name: "BMO Field", city: "Toronto", country: "Kanada", lat: 43.6331, lng: -79.4189, capacity: 45500 },
-            
-            // Mexiko
-            { name: "Estadio Azteca", city: "Mexico City", country: "Mexiko", lat: 19.3031, lng: -99.1506, capacity: 87000 },
-            { name: "Estadio BBVA", city: "Monterrey", country: "Mexiko", lat: 25.669195, lng: -100.244359, capacity: 53500 },
-            { name: "Estadio Akron", city: "Guadalajara", country: "Mexiko", lat: 20.68202, lng: -103.46272, capacity: 48071 }
-        ];
+    // Spielstätten mit Koordinaten
+    const venues = [
+        // USA
+        { name: "MetLife Stadium", city: "New York/New Jersey", country: "USA", lat: 40.8128, lng: -74.0742, capacity: 82500 },
+        { name: "Mercedes-Benz Stadium", city: "Atlanta", country: "USA", lat: 33.7553, lng: -84.4006, capacity: 75000 },
+        { name: "AT&T Stadium", city: "Dallas", country: "USA", lat: 32.7477, lng: -97.0933, capacity: 80000 },
+        { name: "Arrowhead Stadium", city: "Kansas City", country: "USA", lat: 39.0489, lng: -94.4839, capacity: 76416 },
+        { name: "SoFi Stadium", city: "Los Angeles", country: "USA", lat: 33.9535, lng: -118.3392, capacity: 70000 },
+        { name: "Lumen Field", city: "Seattle", country: "USA", lat: 47.5952, lng: -122.3316, capacity: 69000 },
+        { name: "Levi's Stadium", city: "San Francisco Bay Area", country: "USA", lat: 37.4032, lng: -121.9698, capacity: 68500 },
+        { name: "Lincoln Financial Field", city: "Philadelphia", country: "USA", lat: 39.9008, lng: -75.1675, capacity: 69596 },
+        { name: "Hard Rock Stadium", city: "Miami", country: "USA", lat: 25.9581, lng: -80.2389, capacity: 65000 },
+        { name: "Gillette Stadium", city: "Boston", country: "USA", lat: 42.0909, lng: -71.2643, capacity: 70000 },
+        { name: "NRG Stadium", city: "Houston", country: "USA", lat: 29.6847, lng: -95.4107, capacity: 72220 },
 
-        // Vollständiger Spielplan basierend auf den offiziellen Daten
-        const matchSchedule = {
-            0: [  // Thursday, 11 June 2026
-                { venue: "Estadio Azteca", match: "Match 1 - Group A (Mexico #1)", time: "TBD" },
-                { venue: "Estadio Akron", match: "Match 2 - Group A", time: "TBD" }
-            ],
-            1: [  // Friday, 12 June 2026
-                { venue: "BMO Field", match: "Match 3 - Group B (Canada #1)", time: "TBD" },
-                { venue: "SoFi Stadium", match: "Match 4 - Group D (USA #1)", time: "TBD" }
-            ],
-            2: [  // Saturday, 13 June 2026
-                { venue: "Gillette Stadium", match: "Match 5 - Group C", time: "TBD" },
-                { venue: "BC Place", match: "Match 6 - Group D", time: "TBD" },
-                { venue: "MetLife Stadium", match: "Match 7 - Group C", time: "TBD" },
-                { venue: "Levi's Stadium", match: "Match 8 - Group B", time: "TBD" }
-            ],
-            3: [  // Sunday, 14 June 2026
-                { venue: "Lincoln Financial Field", match: "Match 9 - Group E", time: "TBD" },
-                { venue: "NRG Stadium", match: "Match 10 - Group E", time: "TBD" },
-                { venue: "AT&T Stadium", match: "Match 11 - Group F", time: "TBD" },
-                { venue: "Estadio BBVA", match: "Match 12 - Group F", time: "TBD" }
-            ],
-            4: [  // Monday, 15 June 2026
-                { venue: "Hard Rock Stadium", match: "Match 13 - Group H", time: "TBD" },
-                { venue: "Mercedes-Benz Stadium", match: "Match 14 - Group H", time: "TBD" },
-                { venue: "SoFi Stadium", match: "Match 15 - Group G", time: "TBD" },
-                { venue: "Lumen Field", match: "Match 16 - Group G", time: "TBD" }
-            ],
-            5: [  // Tuesday, 16 June 2026
-                { venue: "MetLife Stadium", match: "Match 17 - Group I", time: "TBD" },
-                { venue: "Gillette Stadium", match: "Match 18 - Group I", time: "TBD" },
-                { venue: "Arrowhead Stadium", match: "Match 19 - Group J", time: "TBD" },
-                { venue: "Levi's Stadium", match: "Match 20 - Group J", time: "TBD" }
-            ],
-            6: [  // Wednesday, 17 June 2026
-                { venue: "BMO Field", match: "Match 21 - Group L", time: "TBD" },
-                { venue: "AT&T Stadium", match: "Match 22 - Group L", time: "TBD" },
-                { venue: "NRG Stadium", match: "Match 23 - Group K", time: "TBD" },
-                { venue: "Estadio Azteca", match: "Match 24 - Group K", time: "TBD" }
-            ],
-            7: [  // Thursday, 18 June 2026
-                { venue: "Mercedes-Benz Stadium", match: "Match 25 - Group A", time: "TBD" },
-                { venue: "SoFi Stadium", match: "Match 26 - Group B", time: "TBD" },
-                { venue: "BC Place", match: "Match 27 - Group B (Canada #2)", time: "TBD" },
-                { venue: "Estadio Akron", match: "Match 28 - Group A (Mexico #2)", time: "TBD" }
-            ],
-            8: [  // Friday, 19 June 2026
-                { venue: "Lincoln Financial Field", match: "Match 29 - Group C", time: "TBD" },
-                { venue: "Gillette Stadium", match: "Match 30 - Group C", time: "TBD" },
-                { venue: "Levi's Stadium", match: "Match 31 - Group D", time: "TBD" },
-                { venue: "Lumen Field", match: "Match 32 - Group D (USA #2)", time: "TBD" }
-            ],
-            9: [  // Saturday, 20 June 2026
-                { venue: "BMO Field", match: "Match 33 - Group E", time: "TBD" },
-                { venue: "Arrowhead Stadium", match: "Match 34 - Group E", time: "TBD" },
-                { venue: "NRG Stadium", match: "Match 35 - Group F", time: "TBD" },
-                { venue: "Estadio BBVA", match: "Match 36 - Group F", time: "TBD" }
-            ],
-            10: [  // Sunday, 21 June 2026
-                { venue: "Hard Rock Stadium", match: "Match 37 - Group H", time: "TBD" },
-                { venue: "Mercedes-Benz Stadium", match: "Match 38 - Group H", time: "TBD" },
-                { venue: "SoFi Stadium", match: "Match 39 - Group G", time: "TBD" },
-                { venue: "BC Place", match: "Match 40 - Group G", time: "TBD" }
-            ],
-            11: [  // Monday, 22 June 2026
-                { venue: "MetLife Stadium", match: "Match 41 - Group I", time: "TBD" },
-                { venue: "Lincoln Financial Field", match: "Match 42 - Group I", time: "TBD" },
-                { venue: "AT&T Stadium", match: "Match 43 - Group J", time: "TBD" },
-                { venue: "Levi's Stadium", match: "Match 44 - Group J", time: "TBD" }
-            ],
-            12: [  // Tuesday, 23 June 2026
-                { venue: "Gillette Stadium", match: "Match 45 - Group L", time: "TBD" },
-                { venue: "BMO Field", match: "Match 46 - Group L", time: "TBD" },
-                { venue: "NRG Stadium", match: "Match 47 - Group K", time: "TBD" },
-                { venue: "Estadio Akron", match: "Match 48 - Group K", time: "TBD" }
-            ],
-            13: [  // Wednesday, 24 June 2026
-                { venue: "Hard Rock Stadium", match: "Match 49 - Group C", time: "TBD" },
-                { venue: "Mercedes-Benz Stadium", match: "Match 50 - Group C", time: "TBD" },
-                { venue: "BC Place", match: "Match 51 - Group B (Canada #3)", time: "TBD" },
-                { venue: "Lumen Field", match: "Match 52 - Group B", time: "TBD" },
-                { venue: "Estadio Azteca", match: "Match 53 - Group A (Mexico #3)", time: "TBD" },
-                { venue: "Estadio BBVA", match: "Match 54 - Group A", time: "TBD" }
-            ],
-            14: [  // Thursday, 25 June 2026
-                { venue: "Lincoln Financial Field", match: "Match 55 - Group E", time: "TBD" },
-                { venue: "MetLife Stadium", match: "Match 56 - Group E", time: "TBD" },
-                { venue: "AT&T Stadium", match: "Match 57 - Group F", time: "TBD" },
-                { venue: "Arrowhead Stadium", match: "Match 58 - Group F", time: "TBD" },
-                { venue: "SoFi Stadium", match: "Match 59 - Group D (USA #3)", time: "TBD" },
-                { venue: "Levi's Stadium", match: "Match 60 - Group D", time: "TBD" }
-            ],
-            15: [  // Friday, 26 June 2026
-                { venue: "Gillette Stadium", match: "Match 61 - Group I", time: "TBD" },
-                { venue: "BMO Field", match: "Match 62 - Group I", time: "TBD" },
-                { venue: "Lumen Field", match: "Match 63 - Group G", time: "TBD" },
-                { venue: "BC Place", match: "Match 64 - Group G", time: "TBD" },
-                { venue: "NRG Stadium", match: "Match 65 - Group H", time: "TBD" },
-                { venue: "Estadio Akron", match: "Match 66 - Group H", time: "TBD" }
-            ],
-            16: [  // Saturday, 27 June 2026
-                { venue: "MetLife Stadium", match: "Match 67 - Group L", time: "TBD" },
-                { venue: "Lincoln Financial Field", match: "Match 68 - Group L", time: "TBD" },
-                { venue: "Arrowhead Stadium", match: "Match 69 - Group J", time: "TBD" },
-                { venue: "AT&T Stadium", match: "Match 70 - Group J", time: "TBD" },
-                { venue: "Hard Rock Stadium", match: "Match 71 - Group K", time: "TBD" },
-                { venue: "Mercedes-Benz Stadium", match: "Match 72 - Group K", time: "TBD" }
-            ],
-            17: [  // Sunday, 28 June 2026
-                { venue: "SoFi Stadium", match: "Match 73 - Round of 32", time: "TBD" }
-            ],
-            18: [  // Monday, 29 June 2026
-                { venue: "Gillette Stadium", match: "Match 74 - Round of 32", time: "TBD" },
-                { venue: "Estadio BBVA", match: "Match 75 - Round of 32", time: "TBD" },
-                { venue: "NRG Stadium", match: "Match 76 - Round of 32", time: "TBD" }
-            ],
-            19: [  // Tuesday, 30 June 2026
-                { venue: "MetLife Stadium", match: "Match 77 - Round of 32", time: "TBD" },
-                { venue: "AT&T Stadium", match: "Match 78 - Round of 32", time: "TBD" },
-                { venue: "Estadio Azteca", match: "Match 79 - Round of 32", time: "TBD" }
-            ],
-            20: [  // Wednesday, 1 July 2026
-                { venue: "Mercedes-Benz Stadium", match: "Match 80 - Round of 32", time: "TBD" },
-                { venue: "Levi's Stadium", match: "Match 81 - Round of 32", time: "TBD" },
-                { venue: "Lumen Field", match: "Match 82 - Round of 32", time: "TBD" }
-            ],
-            21: [  // Thursday, 2 July 2026
-                { venue: "BMO Field", match: "Match 83 - Round of 32", time: "TBD" },
-                { venue: "SoFi Stadium", match: "Match 84 - Round of 32", time: "TBD" },
-                { venue: "BC Place", match: "Match 85 - Round of 32", time: "TBD" }
-            ],
-            22: [  // Friday, 3 July 2026
-                { venue: "Hard Rock Stadium", match: "Match 86 - Round of 32", time: "TBD" },
-                { venue: "Arrowhead Stadium", match: "Match 87 - Round of 32", time: "TBD" },
-                { venue: "AT&T Stadium", match: "Match 88 - Round of 32", time: "TBD" }
-            ],
-            23: [  // Saturday, 4 July 2026
-                { venue: "Lincoln Financial Field", match: "Match 89 - Round of 16", time: "TBD" },
-                { venue: "NRG Stadium", match: "Match 90 - Round of 16", time: "TBD" }
-            ],
-            24: [  // Sunday, 5 July 2026
-                { venue: "MetLife Stadium", match: "Match 91 - Round of 16", time: "TBD" },
-                { venue: "Estadio Azteca", match: "Match 92 - Round of 16", time: "TBD" }
-            ],
-            25: [  // Monday, 6 July 2026
-                { venue: "AT&T Stadium", match: "Match 93 - Round of 16", time: "TBD" },
-                { venue: "Lumen Field", match: "Match 94 - Round of 16", time: "TBD" }
-            ],
-            26: [  // Tuesday, 7 July 2026
-                { venue: "Mercedes-Benz Stadium", match: "Match 95 - Round of 16", time: "TBD" },
-                { venue: "BC Place", match: "Match 96 - Round of 16", time: "TBD" }
-            ],
-            28: [  // Thursday, 9 July 2026
-                { venue: "Gillette Stadium", match: "Match 97 - Quarter-final", time: "TBD" }
-            ],
-            29: [  // Friday, 10 July 2026
-                { venue: "SoFi Stadium", match: "Match 98 - Quarter-final", time: "TBD" }
-            ],
-            30: [  // Saturday, 11 July 2026
-                { venue: "Hard Rock Stadium", match: "Match 99 - Quarter-final", time: "TBD" },
-                { venue: "Arrowhead Stadium", match: "Match 100 - Quarter-final", time: "TBD" }
-            ],
-            33: [  // Tuesday, 14 July 2026
-                { venue: "AT&T Stadium", match: "Match 101 - Semi-final", time: "TBD" }
-            ],
-            34: [  // Wednesday, 15 July 2026
-                { venue: "Mercedes-Benz Stadium", match: "Match 102 - Semi-final", time: "TBD" }
-            ],
-            37: [  // Saturday, 18 July 2026
-                { venue: "Hard Rock Stadium", match: "Match 103 - 3rd Place Play-off", time: "TBD" }
-            ],
-            38: [  // Sunday, 19 July 2026
-                { venue: "MetLife Stadium", match: "🏆 Match 104 - FINAL", time: "TBD" }
-            ]
-        };
+        // Kanada
+        { name: "BC Place", city: "Vancouver", country: "Kanada", lat: 49.2767, lng: -123.1119, capacity: 54500 },
+        { name: "BMO Field", city: "Toronto", country: "Kanada", lat: 43.6331, lng: -79.4189, capacity: 45500 },
 
-        // Datumsberechnung
-        function getTournamentDate(dayIndex) {
-            const startDate = new Date(2026, 5, 11); // 11. Juni 2026
-            const currentDate = new Date(startDate);
-            currentDate.setDate(startDate.getDate() + dayIndex);
-            
-            const weekdays = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
-            const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
-            
-            return `${weekdays[currentDate.getDay()]}, ${currentDate.getDate()}. ${months[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
-        }
+        // Mexiko
+        { name: "Estadio Azteca", city: "Mexico City", country: "Mexiko", lat: 19.3031, lng: -99.1506, capacity: 87000 },
+        { name: "Estadio BBVA", city: "Monterrey", country: "Mexiko", lat: 25.669195, lng: -100.244359, capacity: 53500 },
+        { name: "Estadio Akron", city: "Guadalajara", country: "Mexiko", lat: 20.68202, lng: -103.46272, capacity: 48071 }
+    ];
 
-        // Karte initialisieren
-        const map = L.map('map').setView([39.8283, -98.5795], 4);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
+    // Einheitlich strukturierter Spielplan
+const matchSchedule = {
+  0: [ // Thursday, 11 June 2026
+    {
+      venue: "Estadio Azteca",
+      matchNumber: 1,
+      stage: "Gruppenphase",
+      group: "A",
+      homeTeam: "Mexico",
+      awayTeam: "South Africa",
+      extraInfo: "Eröffnungsspiel",
+      localTime: "13:00",
+      timezone: "CST",
+      meszTime: "21:00 Uhr MESZ"
+    },
+    {
+      venue: "Estadio Akron",
+      matchNumber: 2,
+      stage: "Gruppenphase",
+      group: "A",
+      homeTeam: "South Korea",
+      awayTeam: "UEFA 4",
+      extraInfo: "",
+      localTime: "20:00",
+      timezone: "CST",
+      meszTime: "04:00 Uhr MESZ (Folgetag)"
+    }
+  ],
+  1: [  // Friday, 12 June 2026
+    {
+      venue: "BMO Field",
+      matchNumber: 3,
+      stage: "Gruppenphase",
+      group: "B",
+      homeTeam: "Canada",
+      awayTeam: "UEFA 1",
+      extraInfo: "Canada Match #1",
+      localTime: "15:00",
+      timezone: "EDT",
+      meszTime: "21:00 Uhr MESZ"
+    },
+    {
+      venue: "SoFi Stadium",
+      matchNumber: 4,
+      stage: "Gruppenphase",
+      group: "D",
+      homeTeam: "USA",
+      awayTeam: "Paraguay",
+      extraInfo: "USA Match #1",
+      localTime: "18:00",
+      timezone: "PDT",
+      meszTime: "03:00 Uhr MESZ (Folgetag)"
+    }
+  ],
+  2: [  // Saturday, 13 June 2026
+    {
+      venue: "Gillette Stadium",
+      matchNumber: 5,
+      stage: "Gruppenphase",
+      group: "C",
+      homeTeam: "Haiti",
+      awayTeam: "Scotland",
+      extraInfo: "",
+      localTime: "21:00",
+      timezone: "EDT",
+      meszTime: "03:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "BC Place",
+      matchNumber: 6,
+      stage: "Gruppenphase",
+      group: "D",
+      homeTeam: "Australia",
+      awayTeam: "UEFA 3",
+      extraInfo: "",
+      localTime: "21:00",
+      timezone: "PDT",
+      meszTime: "06:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "MetLife Stadium",
+      matchNumber: 7,
+      stage: "Gruppenphase",
+      group: "C",
+      homeTeam: "Brazil",
+      awayTeam: "Morocco",
+      extraInfo: "",
+      localTime: "18:00",
+      timezone: "EDT",
+      meszTime: "00:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "Levi's Stadium",
+      matchNumber: 8,
+      stage: "Gruppenphase",
+      group: "B",
+      homeTeam: "Qatar",
+      awayTeam: "Switzerland",
+      extraInfo: "",
+      localTime: "12:00",
+      timezone: "PDT",
+      meszTime: "21:00 Uhr MESZ"
+    }
+  ],
+  3: [  // Sunday, 14 June 2026
+    {
+      venue: "Lincoln Financial Field",
+      matchNumber: 9,
+      stage: "Gruppenphase",
+      group: "E",
+      homeTeam: "Ivory Coast",
+      awayTeam: "Ecuador",
+      extraInfo: "",
+      localTime: "19:00",
+      timezone: "EDT",
+      meszTime: "01:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "NRG Stadium",
+      matchNumber: 10,
+      stage: "Gruppenphase",
+      group: "E",
+      homeTeam: "Germany",
+      awayTeam: "Curacao",
+      extraInfo: "Germany Match #1",
+      localTime: "12:00",
+      timezone: "CDT",
+      meszTime: "19:00 Uhr MESZ"
+    },
+    {
+      venue: "AT&T Stadium",
+      matchNumber: 11,
+      stage: "Gruppenphase",
+      group: "F",
+      homeTeam: "Netherlands",
+      awayTeam: "Japan",
+      extraInfo: "",
+      localTime: "15:00",
+      timezone: "CDT",
+      meszTime: "22:00 Uhr MESZ"
+    },
+    {
+      venue: "Estadio BBVA",
+      matchNumber: 12,
+      stage: "Gruppenphase",
+      group: "F",
+      homeTeam: "UEFA 2",
+      awayTeam: "Tunisia",
+      extraInfo: "",
+      localTime: "20:00",
+      timezone: "CST",
+      meszTime: "04:00 Uhr MESZ (Folgetag)"
+    }
+  ],
+  4: [  // Monday, 15 June 2026
+    {
+      venue: "Hard Rock Stadium",
+      matchNumber: 13,
+      stage: "Gruppenphase",
+      group: "H",
+      homeTeam: "Saudi Arabia",
+      awayTeam: "Uruguay",
+      extraInfo: "",
+      localTime: "18:00",
+      timezone: "EDT",
+      meszTime: "00:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "Mercedes-Benz Stadium",
+      matchNumber: 14,
+      stage: "Gruppenphase",
+      group: "H",
+      homeTeam: "Spain",
+      awayTeam: "Cape Verde",
+      extraInfo: "",
+      localTime: "12:00",
+      timezone: "EDT",
+      meszTime: "18:00 Uhr MESZ"
+    },
+    {
+      venue: "SoFi Stadium",
+      matchNumber: 15,
+      stage: "Gruppenphase",
+      group: "G",
+      homeTeam: "Iran",
+      awayTeam: "New Zealand",
+      extraInfo: "",
+      localTime: "18:00",
+      timezone: "PDT",
+      meszTime: "03:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "Lumen Field",
+      matchNumber: 16,
+      stage: "Gruppenphase",
+      group: "G",
+      homeTeam: "Belgium",
+      awayTeam: "Egypt",
+      extraInfo: "",
+      localTime: "12:00",
+      timezone: "PDT",
+      meszTime: "21:00 Uhr MESZ"
+    }
+  ],
+  5: [  // Tuesday, 16 June 2026
+    {
+      venue: "MetLife Stadium",
+      matchNumber: 17,
+      stage: "Gruppenphase",
+      group: "I",
+      homeTeam: "France",
+      awayTeam: "Senegal",
+      extraInfo: "",
+      localTime: "15:00",
+      timezone: "EDT",
+      meszTime: "21:00 Uhr MESZ"
+    },
+    {
+      venue: "Gillette Stadium",
+      matchNumber: 18,
+      stage: "Gruppenphase",
+      group: "I",
+      homeTeam: "FIFA 2",
+      awayTeam: "Norway",
+      extraInfo: "",
+      localTime: "18:00",
+      timezone: "EDT",
+      meszTime: "00:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "Arrowhead Stadium",
+      matchNumber: 19,
+      stage: "Gruppenphase",
+      group: "J",
+      homeTeam: "Argentina",
+      awayTeam: "Algeria",
+      extraInfo: "",
+      localTime: "20:00",
+      timezone: "CDT",
+      meszTime: "03:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "Levi's Stadium",
+      matchNumber: 20,
+      stage: "Gruppenphase",
+      group: "J",
+      homeTeam: "Austria",
+      awayTeam: "Jordan",
+      extraInfo: "",
+      localTime: "21:00",
+      timezone: "PDT",
+      meszTime: "06:00 Uhr MESZ (Folgetag)"
+    }
+  ],
+  6: [  // Wednesday, 17 June 2026
+    {
+      venue: "BMO Field",
+      matchNumber: 21,
+      stage: "Gruppenphase",
+      group: "L",
+      homeTeam: "Ghana",
+      awayTeam: "Panama",
+      extraInfo: "",
+      localTime: "19:00",
+      timezone: "EDT",
+      meszTime: "01:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "AT&T Stadium",
+      matchNumber: 22,
+      stage: "Gruppenphase",
+      group: "L",
+      homeTeam: "England",
+      awayTeam: "Croatia",
+      extraInfo: "",
+      localTime: "15:00",
+      timezone: "CDT",
+      meszTime: "22:00 Uhr MESZ"
+    },
+    {
+      venue: "NRG Stadium",
+      matchNumber: 23,
+      stage: "Gruppenphase",
+      group: "K",
+      homeTeam: "Portugal",
+      awayTeam: "FIFA 1",
+      extraInfo: "",
+      localTime: "12:00",
+      timezone: "CDT",
+      meszTime: "19:00 Uhr MESZ"
+    },
+    {
+      venue: "Estadio Azteca",
+      matchNumber: 24,
+      stage: "Gruppenphase",
+      group: "K",
+      homeTeam: "Uzbekistan",
+      awayTeam: "Colombia",
+      extraInfo: "",
+      localTime: "20:00",
+      timezone: "CST",
+      meszTime: "04:00 Uhr MESZ (Folgetag)"
+    }
+  ],
+  7: [  // Thursday, 18 June 2026
+    {
+      venue: "Mercedes-Benz Stadium",
+      matchNumber: 25,
+      stage: "Gruppenphase",
+      group: "A",
+      homeTeam: "UEFA 4",
+      awayTeam: "South Africa",
+      extraInfo: "",
+      localTime: "12:00",
+      timezone: "EDT",
+      meszTime: "18:00 Uhr MESZ"
+    },
+    {
+      venue: "SoFi Stadium",
+      matchNumber: 26,
+      stage: "Gruppenphase",
+      group: "B",
+      homeTeam: "Switzerland",
+      awayTeam: "UEFA 1",
+      extraInfo: "",
+      localTime: "12:00",
+      timezone: "PDT",
+      meszTime: "21:00 Uhr MESZ"
+    },
+    {
+      venue: "BC Place",
+      matchNumber: 27,
+      stage: "Gruppenphase",
+      group: "B",
+      homeTeam: "Canada",
+      awayTeam: "Qatar",
+      extraInfo: "",
+      localTime: "15:00",
+      timezone: "PDT",
+      meszTime: "00:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "Estadio Akron",
+      matchNumber: 28,
+      stage: "Gruppenphase",
+      group: "A",
+      homeTeam: "Mexico",
+      awayTeam: "South Korea",
+      extraInfo: "",
+      localTime: "19:00",
+      timezone: "CST",
+      meszTime: "03:00 Uhr MESZ (Folgetag)"
+    }
+  ],
+  8: [  // Friday, 19 June 2026
+    {
+      venue: "Lincoln Financial Field",
+      matchNumber: 29,
+      stage: "Gruppenphase",
+      group: "C",
+      homeTeam: "Brazil",
+      awayTeam: "Haiti",
+      extraInfo: "",
+      localTime: "21:00",
+      timezone: "EDT",
+      meszTime: "03:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "Gillette Stadium",
+      matchNumber: 30,
+      stage: "Gruppenphase",
+      group: "C",
+      homeTeam: "Scotland",
+      awayTeam: "Morocco",
+      extraInfo: "",
+      localTime: "18:00",
+      timezone: "EDT",
+      meszTime: "00:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "Levi's Stadium",
+      matchNumber: 31,
+      stage: "Gruppenphase",
+      group: "D",
+      homeTeam: "UEFA 3",
+      awayTeam: "Paraguay",
+      extraInfo: "",
+      localTime: "21:00",
+      timezone: "PDT",
+      meszTime: "06:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "Lumen Field",
+      matchNumber: 32,
+      stage: "Gruppenphase",
+      group: "D",
+      homeTeam: "United States",
+      awayTeam: "Australia",
+      extraInfo: "",
+      localTime: "12:00",
+      timezone: "PDT",
+      meszTime: "21:00 Uhr MESZ"
+    }
+  ],
+  9: [  // Saturday, 20 June 2026
+    {
+      venue: "BMO Field",
+      matchNumber: 33,
+      stage: "Gruppenphase",
+      group: "E",
+      homeTeam: "Germany",
+      awayTeam: "Ivory Coast",
+      extraInfo: "",
+      localTime: "16:00",
+      timezone: "EDT",
+      meszTime: "22:00 Uhr MESZ"
+    },
+    {
+      venue: "Arrowhead Stadium",
+      matchNumber: 34,
+      stage: "Gruppenphase",
+      group: "E",
+      homeTeam: "Ecuador",
+      awayTeam: "Curacao",
+      extraInfo: "",
+      localTime: "19:00",
+      timezone: "CDT",
+      meszTime: "02:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "NRG Stadium",
+      matchNumber: 35,
+      stage: "Gruppenphase",
+      group: "F",
+      homeTeam: "Netherlands",
+      awayTeam: "UEFA 2",
+      extraInfo: "",
+      localTime: "12:00",
+      timezone: "CDT",
+      meszTime: "19:00 Uhr MESZ"
+    },
+    {
+      venue: "Estadio BBVA",
+      matchNumber: 36,
+      stage: "Gruppenphase",
+      group: "F",
+      homeTeam: "Tunisia",
+      awayTeam: "Japan",
+      extraInfo: "",
+      localTime: "22:00",
+      timezone: "CST",
+      meszTime: "06:00 Uhr MESZ (Folgetag)"
+    }
+  ],
+  10: [  // Sunday, 21 June 2026
+    {
+      venue: "Hard Rock Stadium",
+      matchNumber: 37,
+      stage: "Gruppenphase",
+      group: "H",
+      homeTeam: "Uruguay",
+      awayTeam: "Cape Verde",
+      extraInfo: "",
+      localTime: "18:00",
+      timezone: "EDT",
+      meszTime: "00:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "Mercedes-Benz Stadium",
+      matchNumber: 38,
+      stage: "Gruppenphase",
+      group: "H",
+      homeTeam: "Spain",
+      awayTeam: "Saudi Arabia",
+      extraInfo: "",
+      localTime: "12:00",
+      timezone: "EDT",
+      meszTime: "18:00 Uhr MESZ"
+    },
+    {
+      venue: "SoFi Stadium",
+      matchNumber: 39,
+      stage: "Gruppenphase",
+      group: "G",
+      homeTeam: "Belgium",
+      awayTeam: "Iran",
+      extraInfo: "",
+      localTime: "12:00",
+      timezone: "PDT",
+      meszTime: "21:00 Uhr MESZ"
+    },
+    {
+      venue: "BC Place",
+      matchNumber: 40,
+      stage: "Gruppenphase",
+      group: "G",
+      homeTeam: "New Zealand",
+      awayTeam: "Egypt",
+      extraInfo: "",
+      localTime: "18:00",
+      timezone: "PDT",
+      meszTime: "03:00 Uhr MESZ (Folgetag)"
+    }
+  ],
+  11: [  // Monday, 22 June 2026
+    {
+      venue: "MetLife Stadium",
+      matchNumber: 41,
+      stage: "Gruppenphase",
+      group: "I",
+      homeTeam: "Norway",
+      awayTeam: "Senegal",
+      extraInfo: "",
+      localTime: "20:00",
+      timezone: "EDT",
+      meszTime: "02:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "Lincoln Financial Field",
+      matchNumber: 42,
+      stage: "Gruppenphase",
+      group: "I",
+      homeTeam: "France",
+      awayTeam: "FIFA Playoff 2",
+      extraInfo: "",
+      localTime: "17:00",
+      timezone: "EDT",
+      meszTime: "23:00 Uhr MESZ"
+    },
+    {
+      venue: "AT&T Stadium",
+      matchNumber: 43,
+      stage: "Gruppenphase",
+      group: "J",
+      homeTeam: "Argentina",
+      awayTeam: "Austria",
+      extraInfo: "",
+      localTime: "12:00",
+      timezone: "CDT",
+      meszTime: "19:00 Uhr MESZ"
+    },
+    {
+      venue: "Levi's Stadium",
+      matchNumber: 44,
+      stage: "Gruppenphase",
+      group: "J",
+      homeTeam: "Jordan",
+      awayTeam: "Algeria",
+      extraInfo: "",
+      localTime: "20:00",
+      timezone: "PDT",
+      meszTime: "05:00 Uhr MESZ (Folgetag)"
+    }
+  ],
+  12: [  // Tuesday, 23 June 2026
+    {
+      venue: "Gillette Stadium",
+      matchNumber: 45,
+      stage: "Gruppenphase",
+      group: "L",
+      homeTeam: "England",
+      awayTeam: "Ghana",
+      extraInfo: "",
+      localTime: "16:00",
+      timezone: "EDT",
+      meszTime: "22:00 Uhr MESZ"
+    },
+    {
+      venue: "BMO Field",
+      matchNumber: 46,
+      stage: "Gruppenphase",
+      group: "L",
+      homeTeam: "Panama",
+      awayTeam: "Croatia",
+      extraInfo: "",
+      localTime: "19:00",
+      timezone: "EDT",
+      meszTime: "01:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "NRG Stadium",
+      matchNumber: 47,
+      stage: "Gruppenphase",
+      group: "K",
+      homeTeam: "Portugal",
+      awayTeam: "Uzbekistan",
+      extraInfo: "",
+      localTime: "13:00",
+      timezone: "CDT",
+      meszTime: "20:00 Uhr MESZ"
+    },
+    {
+      venue: "Estadio Akron",
+      matchNumber: 48,
+      stage: "Gruppenphase",
+      group: "K",
+      homeTeam: "Colombia",
+      awayTeam: "FIFA Playoff 1",
+      extraInfo: "",
+      localTime: "20:00",
+      timezone: "CST",
+      meszTime: "04:00 Uhr MESZ (Folgetag)"
+    }
+  ],
+  13: [  // Wednesday, 24 June 2026
+    {
+      venue: "Hard Rock Stadium",
+      matchNumber: 49,
+      stage: "Gruppenphase",
+      group: "C",
+      homeTeam: "Scotland",
+      awayTeam: "Brazil",
+      extraInfo: "",
+      localTime: "18:00",
+      timezone: "EDT",
+      meszTime: "00:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "Mercedes-Benz Stadium",
+      matchNumber: 50,
+      stage: "Gruppenphase",
+      group: "C",
+      homeTeam: "Morocco",
+      awayTeam: "Haiti",
+      extraInfo: "",
+      localTime: "18:00",
+      timezone: "EDT",
+      meszTime: "00:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "BC Place",
+      matchNumber: 51,
+      stage: "Gruppenphase",
+      group: "B",
+      homeTeam: "Switzerland",
+      awayTeam: "Canada",
+      extraInfo: "Canada #3",
+      localTime: "12:00",
+      timezone: "PDT",
+      meszTime: "21:00 Uhr MESZ"
+    },
+    {
+      venue: "Lumen Field",
+      matchNumber: 52,
+      stage: "Gruppenphase",
+      group: "B",
+      homeTeam: "UEFA Playoff 1",
+      awayTeam: "Qatar",
+      extraInfo: "",
+      localTime: "12:00",
+      timezone: "PDT",
+      meszTime: "21:00 Uhr MESZ"
+    },
+    {
+      venue: "Estadio Azteca",
+      matchNumber: 53,
+      stage: "Gruppenphase",
+      group: "A",
+      homeTeam: "UEFA Playoff 4",
+      awayTeam: "Mexico",
+      extraInfo: "Mexico #3",
+      localTime: "19:00",
+      timezone: "CST",
+      meszTime: "03:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "Estadio BBVA",
+      matchNumber: 54,
+      stage: "Gruppenphase",
+      group: "A",
+      homeTeam: "South Africa",
+      awayTeam: "South Korea",
+      extraInfo: "",
+      localTime: "19:00",
+      timezone: "CST",
+      meszTime: "03:00 Uhr MESZ (Folgetag)"
+    }
+  ],
+  14: [  // Thursday, 25 June 2026
+    {
+      venue: "Lincoln Financial Field",
+      matchNumber: 55,
+      stage: "Gruppenphase",
+      group: "E",
+      homeTeam: "Curacao",
+      awayTeam: "Ivory Coast",
+      extraInfo: "",
+      localTime: "16:00",
+      timezone: "EDT",
+      meszTime: "22:00 Uhr MESZ"
+    },
+    {
+      venue: "MetLife Stadium",
+      matchNumber: 56,
+      stage: "Gruppenphase",
+      group: "E",
+      homeTeam: "Ecuador",
+      awayTeam: "Germany",
+      extraInfo: "",
+      localTime: "16:00",
+      timezone: "EDT",
+      meszTime: "22:00 Uhr MESZ"
+    },
+    {
+      venue: "AT&T Stadium",
+      matchNumber: 57,
+      stage: "Gruppenphase",
+      group: "F",
+      homeTeam: "Japan",
+      awayTeam: "UEFA Playoff 2",
+      extraInfo: "",
+      localTime: "18:00",
+      timezone: "CDT",
+      meszTime: "01:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "Arrowhead Stadium",
+      matchNumber: 58,
+      stage: "Gruppenphase",
+      group: "F",
+      homeTeam: "Tunisia",
+      awayTeam: "Netherlands",
+      extraInfo: "",
+      localTime: "18:00",
+      timezone: "CDT",
+      meszTime: "01:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "SoFi Stadium",
+      matchNumber: 59,
+      stage: "Gruppenphase",
+      group: "D",
+      homeTeam: "UEFA Playoff 3",
+      awayTeam: "United States",
+      extraInfo: "USA #3",
+      localTime: "19:00",
+      timezone: "PDT",
+      meszTime: "04:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "Levi's Stadium",
+      matchNumber: 60,
+      stage: "Gruppenphase",
+      group: "D",
+      homeTeam: "Paraguay",
+      awayTeam: "Australia",
+      extraInfo: "",
+      localTime: "19:00",
+      timezone: "PDT",
+      meszTime: "04:00 Uhr MESZ (Folgetag)"
+    }
+  ],
+  15: [  // Friday, 26 June 2026
+    {
+      venue: "Gillette Stadium",
+      matchNumber: 61,
+      stage: "Gruppenphase",
+      group: "I",
+      homeTeam: "Norway",
+      awayTeam: "France",
+      extraInfo: "",
+      localTime: "15:00",
+      timezone: "EDT",
+      meszTime: "21:00 Uhr MESZ"
+    },
+    {
+      venue: "BMO Field",
+      matchNumber: 62,
+      stage: "Gruppenphase",
+      group: "I",
+      homeTeam: "Senegal",
+      awayTeam: "FIFA Playoff 2",
+      extraInfo: "",
+      localTime: "15:00",
+      timezone: "EDT",
+      meszTime: "21:00 Uhr MESZ"
+    },
+    {
+      venue: "Lumen Field",
+      matchNumber: 63,
+      stage: "Gruppenphase",
+      group: "G",
+      homeTeam: "Egypt",
+      awayTeam: "Iran",
+      extraInfo: "",
+      localTime: "20:00",
+      timezone: "PDT",
+      meszTime: "05:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "BC Place",
+      matchNumber: 64,
+      stage: "Gruppenphase",
+      group: "G",
+      homeTeam: "New Zealand",
+      awayTeam: "Belgium",
+      extraInfo: "",
+      localTime: "20:00",
+      timezone: "PDT",
+      meszTime: "05:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "NRG Stadium",
+      matchNumber: 65,
+      stage: "Gruppenphase",
+      group: "H",
+      homeTeam: "Cape Verde",
+      awayTeam: "Saudi Arabia",
+      extraInfo: "",
+      localTime: "19:00",
+      timezone: "CDT",
+      meszTime: "02:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "Estadio Akron",
+      matchNumber: 66,
+      stage: "Gruppenphase",
+      group: "H",
+      homeTeam: "Uruguay",
+      awayTeam: "Spain",
+      extraInfo: "",
+      localTime: "18:00",
+      timezone: "CST",
+      meszTime: "02:00 Uhr MESZ (Folgetag)"
+    }
+  ],
+  16: [  // Saturday, 27 June 2026
+    {
+      venue: "MetLife Stadium",
+      matchNumber: 67,
+      stage: "Gruppenphase",
+      group: "L",
+      homeTeam: "Panama",
+      awayTeam: "England",
+      extraInfo: "",
+      localTime: "17:00",
+      timezone: "EDT",
+      meszTime: "23:00 Uhr MESZ"
+    },
+    {
+      venue: "Lincoln Financial Field",
+      matchNumber: 68,
+      stage: "Gruppenphase",
+      group: "L",
+      homeTeam: "Croatia",
+      awayTeam: "Ghana",
+      extraInfo: "",
+      localTime: "17:00",
+      timezone: "EDT",
+      meszTime: "23:00 Uhr MESZ"
+    },
+    {
+      venue: "Arrowhead Stadium",
+      matchNumber: 69,
+      stage: "Gruppenphase",
+      group: "J",
+      homeTeam: "Algeria",
+      awayTeam: "Austria",
+      extraInfo: "",
+      localTime: "21:00",
+      timezone: "CDT",
+      meszTime: "04:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "AT&T Stadium",
+      matchNumber: 70,
+      stage: "Gruppenphase",
+      group: "J",
+      homeTeam: "Jordan",
+      awayTeam: "Argentina",
+      extraInfo: "",
+      localTime: "21:00",
+      timezone: "CDT",
+      meszTime: "04:00 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "Hard Rock Stadium",
+      matchNumber: 71,
+      stage: "Gruppenphase",
+      group: "K",
+      homeTeam: "Colombia",
+      awayTeam: "Portugal",
+      extraInfo: "",
+      localTime: "19:30",
+      timezone: "EDT",
+      meszTime: "01:30 Uhr MESZ (Folgetag)"
+    },
+    {
+      venue: "Mercedes-Benz Stadium",
+      matchNumber: 72,
+      stage: "Gruppenphase",
+      group: "K",
+      homeTeam: "FIFA Playoff 1",
+      awayTeam: "Uzbekistan",
+      extraInfo: "",
+      localTime: "19:30",
+      timezone: "EDT",
+      meszTime: "01:30 MESZ (Folgetag)"
+    }
+  ],
 
-        // Marker für Spielstätten
-        const markers = {};
-        
-        venues.forEach(venue => {
-            const marker = L.circleMarker([venue.lat, venue.lng], {
-                radius: 8,
-                fillColor: '#ccc',
-                color: '#333',
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 0.8
-            });
-            
-            marker.bindPopup(`
-                <div style="text-align: center; padding: 10px;">
-                    <h4 style="margin: 0 0 10px 0; color: #333;">${venue.name}</h4>
-                    <p style="margin: 5px 0; color: #666;"><strong>📍 ${venue.city}, ${venue.country}</strong></p>
-                    <p style="margin: 5px 0; color: #666;"><strong>👥 Kapazität:</strong> ${venue.capacity.toLocaleString()}</p>
-                </div>
-            `);
-            
-            markers[venue.name] = marker;
-            marker.addTo(map);
-        });
+        // Ab hier: K.o.-Runde mit Stadien, aber alle sportlichen Details als "tbd"
 
-        // Slider-Funktionalität
-        const dateSlider = document.getElementById('dateSlider');
-        const currentDateDiv = document.getElementById('currentDate');
-        const matchInfo = document.getElementById('matchInfo');
-        const matchList = document.getElementById('matchList');
-
-        function updateMapForDay(dayIndex) {
-            const currentDate = getTournamentDate(dayIndex);
-            currentDateDiv.textContent = `📅 ${currentDate}: Turniertag ${dayIndex + 1}`;
-            
-            // Alle Marker zurücksetzen
-            Object.values(markers).forEach(marker => {
-                marker.setStyle({
-                    fillColor: '#ccc',
-                    color: '#333'
-                });
-            });
-            
-            // Matches für den Tag
-            const dayMatches = matchSchedule[dayIndex] || [];
-            
-            if (dayMatches.length > 0) {
-                // Aktive Spielstätten hervorheben
-                dayMatches.forEach(match => {
-                    if (markers[match.venue]) {
-                        markers[match.venue].setStyle({
-                            fillColor: '#ff4444',
-                            color: '#cc0000'
-                        });
-                    }
-                });
-                
-                // Match-Liste anzeigen
-                matchList.innerHTML = '';
-		dayMatches.forEach(match => {
-		    const venue = venues.find(v => v.name === match.venue);
-		    const cityName = venue ? venue.city : '';
-		    const li = document.createElement('li');
-		    li.innerHTML = `<strong>${match.venue} (${cityName})</strong><br>${match.match} - ${match.time} Uhr`;
-		    matchList.appendChild(li);
-                });
-                
-                matchInfo.classList.add('show');
-            } else {
-                matchInfo.classList.remove('show');
+        17: [  // Sunday, 28 June 2026 - Round of 32
+            {
+                venue: "SoFi Stadium",
+                matchNumber: 73,
+                stage: "Round of 32",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
             }
-	    // Match-Info Überschrift mit Datum aktualisieren
-    	    const matchInfoHeader = document.querySelector('#matchInfo h4');
-    	    if (matchInfoHeader) {
-        	matchInfoHeader.textContent = `🏟️ Matches des Tages - ${currentDate}`;
-    	    }
-        }
+        ],
 
-        dateSlider.addEventListener('input', (e) => {
-            updateMapForDay(parseInt(e.target.value));
+        18: [  // Monday, 29 June 2026 - Round of 32
+            {
+                venue: "Gillette Stadium",
+                matchNumber: 74,
+                stage: "Round of 32",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            },
+            {
+                venue: "Estadio BBVA",
+                matchNumber: 75,
+                stage: "Round of 32",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            },
+            {
+                venue: "NRG Stadium",
+                matchNumber: 76,
+                stage: "Round of 32",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            }
+        ],
+
+        19: [  // Tuesday, 30 June 2026 - Round of 32
+            {
+                venue: "MetLife Stadium",
+                matchNumber: 77,
+                stage: "Round of 32",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            },
+            {
+                venue: "AT&T Stadium",
+                matchNumber: 78,
+                stage: "Round of 32",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            },
+            {
+                venue: "Estadio Azteca",
+                matchNumber: 79,
+                stage: "Round of 32",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            }
+        ],
+
+        20: [  // Wednesday, 1 July 2026 - Round of 32
+            {
+                venue: "Mercedes-Benz Stadium",
+                matchNumber: 80,
+                stage: "Round of 32",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            },
+            {
+                venue: "Levi's Stadium",
+                matchNumber: 81,
+                stage: "Round of 32",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            },
+            {
+                venue: "Lumen Field",
+                matchNumber: 82,
+                stage: "Round of 32",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            }
+        ],
+
+        21: [  // Thursday, 2 July 2026 - Round of 32
+            {
+                venue: "BMO Field",
+                matchNumber: 83,
+                stage: "Round of 32",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            },
+            {
+                venue: "SoFi Stadium",
+                matchNumber: 84,
+                stage: "Round of 32",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            },
+            {
+                venue: "BC Place",
+                matchNumber: 85,
+                stage: "Round of 32",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            }
+        ],
+
+        22: [  // Friday, 3 July 2026 - Round of 32
+            {
+                venue: "Hard Rock Stadium",
+                matchNumber: 86,
+                stage: "Round of 32",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            },
+            {
+                venue: "Arrowhead Stadium",
+                matchNumber: 87,
+                stage: "Round of 32",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            },
+            {
+                venue: "AT&T Stadium",
+                matchNumber: 88,
+                stage: "Round of 32",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            }
+        ],
+
+        23: [  // Saturday, 4 July 2026 - Round of 16
+            {
+                venue: "Lincoln Financial Field",
+                matchNumber: 89,
+                stage: "Round of 16",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            },
+            {
+                venue: "NRG Stadium",
+                matchNumber: 90,
+                stage: "Round of 16",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            }
+        ],
+
+        24: [  // Sunday, 5 July 2026 - Round of 16
+            {
+                venue: "MetLife Stadium",
+                matchNumber: 91,
+                stage: "Round of 16",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            },
+            {
+                venue: "Estadio Azteca",
+                matchNumber: 92,
+                stage: "Round of 16",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            }
+        ],
+
+        25: [  // Monday, 6 July 2026 - Round of 16
+            {
+                venue: "AT&T Stadium",
+                matchNumber: 93,
+                stage: "Round of 16",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            },
+            {
+                venue: "Lumen Field",
+                matchNumber: 94,
+                stage: "Round of 16",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            }
+        ],
+
+        26: [  // Tuesday, 7 July 2026 - Round of 16
+            {
+                venue: "Mercedes-Benz Stadium",
+                matchNumber: 95,
+                stage: "Round of 16",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            },
+            {
+                venue: "BC Place",
+                matchNumber: 96,
+                stage: "Round of 16",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            }
+        ],
+
+        28: [  // Thursday, 9 July 2026 - Quarter-final
+            {
+                venue: "Gillette Stadium",
+                matchNumber: 97,
+                stage: "Quarter-final",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            }
+        ],
+
+        29: [  // Friday, 10 July 2026 - Quarter-final
+            {
+                venue: "SoFi Stadium",
+                matchNumber: 98,
+                stage: "Quarter-final",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            }
+        ],
+
+        30: [  // Saturday, 11 July 2026 - Quarter-final
+            {
+                venue: "Hard Rock Stadium",
+                matchNumber: 99,
+                stage: "Quarter-final",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            },
+            {
+                venue: "Arrowhead Stadium",
+                matchNumber: 100,
+                stage: "Quarter-final",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            }
+        ],
+
+        33: [  // Tuesday, 14 July 2026 - Semi-final
+            {
+                venue: "AT&T Stadium",
+                matchNumber: 101,
+                stage: "Semi-final",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            }
+        ],
+
+        34: [  // Wednesday, 15 July 2026 - Semi-final
+            {
+                venue: "Mercedes-Benz Stadium",
+                matchNumber: 102,
+                stage: "Semi-final",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            }
+        ],
+
+        37: [  // Saturday, 18 July 2026 - 3rd Place
+            {
+                venue: "Hard Rock Stadium",
+                matchNumber: 103,
+                stage: "Spiel um Platz 3",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            }
+        ],
+
+        38: [  // Sunday, 19 July 2026 - FINAL
+            {
+                venue: "MetLife Stadium",
+                matchNumber: 104,
+                stage: "Finale",
+                group: "tbd",
+                homeTeam: "tbd",
+                awayTeam: "tbd",
+                extraInfo: "🏆 Finale",
+                localTime: "tbd",
+                timezone: "tbd",
+                meszTime: "tbd"
+            }
+        ]
+    };
+
+    // Datumsberechnung
+    function getTournamentDate(dayIndex) {
+        const startDate = new Date(2026, 5, 11); // 11. Juni 2026
+        const currentDate = new Date(startDate);
+        currentDate.setDate(startDate.getDate() + dayIndex);
+
+        const weekdays = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+        const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+
+        return `${weekdays[currentDate.getDay()]}, ${currentDate.getDate()}. ${months[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+    }
+
+    // Karte initialisieren
+    const map = L.map('map').setView([39.8283, -98.5795], 4);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Marker für Spielstätten
+    const markers = {};
+
+    venues.forEach(venue => {
+        const marker = L.circleMarker([venue.lat, venue.lng], {
+            radius: 8,
+            fillColor: '#ccc',
+            color: '#333',
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.8
         });
 
-        // Initialisierung
-        updateMapForDay(0);
-    </script>
+        marker.bindPopup(`
+            <div style="text-align: center; padding: 10px;">
+                <h4 style="margin: 0 0 10px 0; color: #333;">${venue.name}</h4>
+                <p style="margin: 5px 0; color: #666;"><strong>📍 ${venue.city}, ${venue.country}</strong></p>
+                <p style="margin: 5px 0; color: #666;"><strong>👥 Kapazität:</strong> ${venue.capacity.toLocaleString()}</p>
+            </div>
+        `);
+
+        markers[venue.name] = marker;
+        marker.addTo(map);
+    });
+
+    // Slider-Funktionalität
+    const dateSlider = document.getElementById('dateSlider');
+    const currentDateDiv = document.getElementById('currentDate');
+    const matchInfo = document.getElementById('matchInfo');
+    const matchList = document.getElementById('matchList');
+
+    function updateMapForDay(dayIndex) {
+        const currentDate = getTournamentDate(dayIndex);
+        currentDateDiv.textContent = `📅 ${currentDate}: Turniertag ${dayIndex + 1}`;
+
+        // Alle Marker zurücksetzen
+        Object.values(markers).forEach(marker => {
+            marker.setStyle({
+                fillColor: '#ccc',
+                color: '#333'
+            });
+        });
+
+        // Matches für den Tag
+        const dayMatches = matchSchedule[dayIndex] || [];
+
+        if (dayMatches.length > 0) {
+            // Aktive Spielstätten hervorheben
+            dayMatches.forEach(match => {
+                if (markers[match.venue]) {
+                    markers[match.venue].setStyle({
+                        fillColor: '#ff4444',
+                        color: '#cc0000'
+                    });
+                }
+            });
+
+            // Match-Liste anzeigen
+            matchList.innerHTML = '';
+            dayMatches.forEach(match => {
+                const venue = venues.find(v => v.name === match.venue);
+                const cityName = venue ? venue.city : '';
+
+                const stageLabel = match.stage 
+                    ? match.stage 
+                    : (match.group ? `Gruppe ${match.group}` : 'tbd');
+
+                const home = match.homeTeam || "tbd";
+                const away = match.awayTeam || "tbd";
+                const local = match.localTime || "tbd";
+                const tz = match.timezone || "tbd";
+                const mesz = match.meszTime || "tbd";
+
+                const li = document.createElement('li');
+
+const showGroup =
+  typeof match.matchNumber === "number" && match.matchNumber <= 72;
+
+li.innerHTML = `
+  <strong>${match.venue} (${cityName})</strong><br>
+  Match ${match.matchNumber}${
+    showGroup && match.group ? ` - Gruppe ${match.group}` : ""
+  }: 
+  <strong>${home}</strong> vs. <strong>${away}</strong>${match.extraInfo ? " (" + match.extraInfo + ")" : ""}<br>
+  🕐 <span class="time-local">${local} Uhr Ortszeit ${tz}</span> | 
+  <span class="time-mesz">${mesz}</span>
+`;
+matchList.appendChild(li);
+
+            });
+
+            matchInfo.classList.add('show');
+        } else {
+            matchInfo.classList.remove('show');
+        }
+
+        // Match-Info Überschrift mit Datum aktualisieren
+        const matchInfoHeader = document.querySelector('#matchInfo h4');
+        if (matchInfoHeader) {
+            matchInfoHeader.textContent = `🏟️ Matches des Tages - ${currentDate}`;
+        }
+    }
+
+    dateSlider.addEventListener('input', (e) => {
+        updateMapForDay(parseInt(e.target.value));
+    });
+
+    // Initialisierung
+    updateMapForDay(0);
+</script>
 
 <script>
-  // Transit tile layer (example using a transport tile provider)
+  // ÖPNV-Layer
   var transitLayer = L.tileLayer('https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=db7fa04fb97841db9c0858995a30cbb6', {
     attribution: '&copy; <a href="https://www.thunderforest.com/">Thunderforest</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     maxZoom: 22
   });
 
-  // Add layer control if map is defined
   if (typeof map !== 'undefined') {
     var baseMaps = {};
     var overlayMaps = {
