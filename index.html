@@ -2163,38 +2163,94 @@ const matchSchedule = {
 
     // Funktion für Länder-Flaggen-Emoji
     function getCountryFlag(team) {
-        const flags = {
-            'Deutschland': '🇩🇪',
-            'Brasilien': '🇧🇷',
-            'Frankreich': '🇫🇷',
-            'Schweiz': '🇨🇭',
-            'Uruguay': '🇺🇾'
-        };
-        return flags[team] || '🏳️';
-    }
+    const codes = {
+        // Gruppe A
+        'Mexiko':               'MEX',
+        'Südkorea':             'KOR',
+        'Tschechien':           'CZE',
+        'Südafrika':            'RSA',
+        // Gruppe B
+        'Kanada':               'CAN',
+        'Katar':                'QAT',
+        'Schweiz':              'SUI',
+        'Bosnien-Herzegowina':  'BIH',
+        // Gruppe C
+        'Brasilien':            'BRA',
+        'Marokko':              'MAR',
+        'Haiti':                'HAI',
+        'Schottland':           'SCO',
+        // Gruppe D
+        'USA':                  'USA',
+        'Australien':           'AUS',
+        'Türkei':               'TUR',
+        'Paraguay':             'PAR',
+        // Gruppe E
+        'Deutschland':          'GER',
+        'Elfenbeinküste':       'CIV',
+        'Ecuador':              'ECU',
+        'Curaçao':              'CUW',
+        // Gruppe F
+        'Niederlande':          'NED',
+        'Japan':                'JPN',
+        'Schweden':             'SWE',
+        'Tunesien':             'TUN',
+        // Gruppe G
+        'Belgien':              'BEL',
+        'Ägypten':              'EGY',
+        'Iran':                 'IRN',
+        'Neuseeland':           'NZL',
+        // Gruppe H
+        'Spanien':              'ESP',
+        'Saudi-Arabien':        'KSA',
+        'Uruguay':              'URU',
+        'Kap Verde':            'CPV',
+        // Gruppe I
+        'Frankreich':           'FRA',
+        'Senegal':              'SEN',
+        'Norwegen':             'NOR',
+        'Irak':                 'IRQ',
+        // Gruppe J
+        'Argentinien':          'ARG',
+        'Algerien':             'ALG',
+        'Österreich':           'AUT',
+        'Jordanien':            'JOR',
+        // Gruppe K
+        'Portugal':             'POR',
+        'Kolumbien':            'COL',
+        'Usbekistan':           'UZB',
+        'Kongo':                'CGO',
+        // Gruppe L
+        'England':              'ENG',
+        'Kroatien':             'CRO',
+        'Ghana':                'GHA',
+        'Panama':               'PAN'
+    };
+    return codes[team] || '???';
+}
 
     baseCamps.forEach(camp => {
     // Custom Icon für Basislager mit Landesflagge
     const campIcon = L.divIcon({
-        className: 'base-camp-marker',
-        html: `<div style="
-            background: white;
-            color: black;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            border: 2px solid #4CAF50;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: bold;
-        ">${getCountryFlag(camp.team)}</div>`,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12],
-        popupAnchor: [0, -12]
-    });
+    className: 'base-camp-marker',
+    html: `<div style="
+        background: white;
+        color: black;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 2px solid #4CAF50;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 8px;
+        font-weight: bold;
+        letter-spacing: -0.5px;
+    ">${getCountryFlag(camp.team)}</div>`,
+    iconSize: [36, 36],
+    iconAnchor: [18, 18],
+    popupAnchor: [0, -18]
+});
 
     const marker = L.marker([camp.lat, camp.lng], { icon: campIcon });
 
