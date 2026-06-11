@@ -2574,6 +2574,9 @@ const todayIndex = getTodayTournamentDay();
 const initialDay = (todayIndex >= 0 && todayIndex <= 38) ? todayIndex : 0;
 dateSlider.value = initialDay;
 updateMapForDay(initialDay);
+
+// Button alle 60 Sekunden aktualisieren (für offene Tabs über Mitternacht)
+setInterval(updateCurrentDayButton, 60 * 1000);
 </script>
 
 <script>
