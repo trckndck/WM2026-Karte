@@ -2450,89 +2450,130 @@ const matchSchedule = {
 });
 
     // Slider-Funktionalität
-    const dateSlider = document.getElementById('dateSlider');
-    const currentDateDiv = document.getElementById('currentDate');
-    const matchInfo = document.getElementById('matchInfo');
-    const matchList = document.getElementById('matchList');
+const dateSlider = document.getElementById('dateSlider');
+const currentDateDiv = document.getElementById('currentDate');
+const matchInfo = document.getElementById('matchInfo');
+const matchList = document.getElementById('matchList');
+const currentDayButton = document.getElementById('currentDayButton');
 
-    function updateMapForDay(dayIndex) {
-        const currentDate = getTournamentDate(dayIndex);
-        currentDateDiv.textContent = `📅 ${currentDate}: Turniertag ${dayIndex + 1}`;
-
-        // Alle Marker zurücksetzen
-        Object.values(markers).forEach(marker => {
-            marker.setStyle({
-                fillColor: '#ccc',
-                color: '#333'
-            });
+function updateMapForDay(dayIndex) {
+    const currentDate = getTournamentDate(dayIndex);
+    currentDateDiv.textContent = `📅 ${currentDate}: Turniertag ${dayIndex + 1}`;
+    // Alle Marker zurücksetzen
+    Object.values(markers).forEach(marker => {
+        marker.setStyle({
+            fillColor: '#ccc',
+            color: '#333'
         });
-
-        // Matches für den Tag
-        const dayMatches = matchSchedule[dayIndex] || [];
-
-        if (dayMatches.length > 0) {
-            // Aktive Spielstätten hervorheben
-            dayMatches.forEach(match => {
-                if (markers[match.venue]) {
-                    markers[match.venue].setStyle({
-                        fillColor: '#ff4444',
-                        color: '#cc0000'
-                    });
-                }
-            });
-
-            // Match-Liste anzeigen
-            matchList.innerHTML = '';
-            dayMatches.forEach(match => {
-                const venue = venues.find(v => v.name === match.venue);
-                const cityName = venue ? venue.city : '';
-
-                const stageLabel = match.stage 
-                    ? match.stage 
-                    : (match.group ? `Gruppe ${match.group}` : 'tbd');
-
-                const home = match.homeTeam || "tbd";
-                const away = match.awayTeam || "tbd";
-                const local = match.localTime || "tbd";
-                const tz = match.timezone || "tbd";
-                const mesz = match.meszTime || "tbd";
-
-                const li = document.createElement('li');
-
-const showGroup =
-  typeof match.matchNumber === "number" && match.matchNumber <= 72;
-
-li.innerHTML = `
-  <strong>${match.venue} (${cityName})</strong><br>
-  Match ${match.matchNumber}${
-    showGroup && match.group ? ` - Gruppe ${match.group}` : ""
-  }: 
-  <strong>${home}</strong> vs. <strong>${away}</strong>${match.extraInfo ? " (" + match.extraInfo + ")" : ""}<br>
-  🕐 <span class="time-local">${local} Uhr Ortszeit ${tz}</span> | 
-  <span class="time-mesz">${mesz}</span>
-`;
-matchList.appendChild(li);
-
-            });
-
-            matchInfo.classList.add('show');
-        } else {
-            matchInfo.classList.remove('show');
-        }
-
-        // Match-Info Überschrift mit Datum aktualisieren
-        const matchInfoHeader = document.querySelector('#matchInfo h4');
-        if (matchInfoHeader) {
-            matchInfoHeader.textContent = `🏟️ Matches des Tages - ${currentDate}`;
-        }
-    }
-
-    dateSlider.addEventListener('input', (e) => {
-        updateMapForDay(parseInt(e.target.value));
     });
+    // Matches für den Tag
+    const dayMatches = matchSchedule[dayIndex] || [];
+    if (dayMatches.length > 0) {
+        // Aktive Spielstätten hervorheben
+        dayMatches.forEach(match => {
+            if (markers[match.venue]) {
+                markers[match.venue].setStyle({
+                    fillColor: '#ff4444',
+                    color: '#cc0000'
+                });
+            }
+        });
+        // Match-Liste anzeigen
+        matchList.innerHTML = '';
+        dayMatches.forEach(match => {
+            const venue = venues.find(v => v.name === match.venue);
+            const cityName = venue ? venue.city : '';
+            const stageLabel = match.stage
+                ? match.stage
+                : (match.group ? `Gruppe ${match.group}` : 'tbd');
+            const home = match.homeTeam || "tbd";
+            const away = match.awayTeam || "tbd";
+            const local = match.localTime || "tbd";
+            const tz = match.timezone || "tbd";
+            const mesz = match.meszTime || "tbd";
+            const li = document.createElement('li');
+            const showGroup =
+                typeof match.matchNumber === "number" && match.matchNumber <= 72;
+            li.innerHTML = `
+                <strong>${match.venue} (${cityName})</strong><br>
+                Match ${match.matchNumber}${
+                    showGroup && match.group ? `- Gruppe ${match.group}` : ""
+                }:
+                <strong>${home}</strong> vs. <strong>${away}</strong>${match.extraInfo ? " (" + match.extraInfo + ")" : ""}<br>
+                🕐 <span class="time-local">${local} Uhr Ortszeit ${tz}</span> |
+                <span class="time-mesz">${mesz}</span>
+            `;
+            matchList.appendChild(li);
+        });
+        matchInfo.classList.add('show');
+    } else {
+        matchInfo.classList.remove('show');
+    }
+    // Match-Info Überschrift mit Datum aktualisieren
+    const matchInfoHeader = document.querySelector('#matchInfo h4');
+    if (matchInfoHeader) {
+        matchInfoHeader.textContent = `🏟️ Matches des Tages - ${currentDate}`;
+    }
+}
 
-    // Initialisierung
-    updateMapForDay(0);
+// === "Heute"-Button-Logik ===
+function getTodayTournamentDay() {
+    // Turnierstart: 11. Juni 2026 (Monat ist 0-basiert, also 5 = Juni)
+    const start = new Date(2026, 5, 11);
+    start.setHours(0, 0, 0, 0);
+
+    // Turnierende: 19. Juli 2026 (Tag-Index 38)
+    const end = new Date(2026, 6, 19);
+    end.setHours(0, 0, 0, 0);
+
+    // Heute auf Mitternacht normalisieren
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (today < start) return -1;  // WM hat noch nicht begonnen
+    if (today > end)   return -2;  // WM ist bereits vorbei
+
+    return Math.round((today - start) / (1000 * 60 * 60 * 24));
+}
+
+function updateCurrentDayButton() {
+    const dayIndex = getTodayTournamentDay();
+
+    if (dayIndex === -1) {
+        currentDayButton.textContent = '📅 Heute (WM läuft noch nicht)';
+        currentDayButton.disabled = true;
+    } else if (dayIndex === -2) {
+        currentDayButton.textContent = '📅 Heute (WM ist beendet)';
+        currentDayButton.disabled = true;
+    } else {
+        const dateLabel = getTournamentDate(dayIndex);
+        currentDayButton.textContent = `📅 Heute: ${dateLabel} (Turniertag ${dayIndex + 1})`;
+        currentDayButton.disabled = false;
+    }
+}
+
+currentDayButton.addEventListener('click', () => {
+    const dayIndex = getTodayTournamentDay();
+    if (dayIndex >= 0 && dayIndex <= 38) {
+        dateSlider.value = dayIndex;
+        updateMapForDay(dayIndex);
+    }
+});
+
+dateSlider.addEventListener('input', (e) => {
+    updateMapForDay(parseInt(e.target.value));
+});
+
+// === Initialisierung ===
+// Button-Text und -Status auf Basis des heutigen Datums setzen
+updateCurrentDayButton();
+
+// Wenn die WM gerade läuft, beim Laden direkt zum heutigen Tag springen,
+// sonst Tag 1 (11.6.2026) anzeigen.
+const todayIndex = getTodayTournamentDay();
+const initialDay = (todayIndex >= 0 && todayIndex <= 38) ? todayIndex : 0;
+dateSlider.value = initialDay;
+updateMapForDay(initialDay);
 </script>
 
 <script>
